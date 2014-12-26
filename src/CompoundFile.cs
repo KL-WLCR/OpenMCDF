@@ -124,6 +124,8 @@ namespace OpenMcdf
     /// </summary>
     public class CompoundFile : IDisposable
     {
+        private readonly bool _leaveOpen;
+
         private CFSConfiguration configuration
             = CFSConfiguration.Default;
 
@@ -458,8 +460,9 @@ namespace OpenMcdf
         /// </example>
         /// <exception cref="T:OpenMcdf.CFException">Raised when trying to open a non-seekable stream</exception>
         /// <exception cref="T:OpenMcdf.CFException">Raised stream is null</exception>
-        public CompoundFile(Stream stream)
+        public CompoundFile(Stream stream, bool leaveOpen=false)
         {
+            _leaveOpen = leaveOpen;
             LoadStream(stream);
 
             DIFAT_SECTOR_FAT_ENTRIES_COUNT = (GetSectorSize() / 4) - 1;
@@ -701,7 +704,7 @@ namespace OpenMcdf
             }
             catch (Exception)
             {
-                if (stream != null)
+                if (stream != null && !_leaveOpen)
                     stream.Close();
 
                 throw;
